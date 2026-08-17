@@ -18,32 +18,32 @@ This repository owns the **agent, API, authentication, and frontend layers**. It
 | --- | --- |
 | React application | [https://bigquery-semantic-search.web.app](https://bigquery-semantic-search.web.app) |
 | Agent API | `https://atomic-habits-agent-api-nfp4nl2vna-uc.a.run.app` |
-| Agent health | `/health` â€” public |
-| Chat endpoint | `/chat` â€” Firebase ID token required |
+| Agent health | `/health` — public |
+| Chat endpoint | `/chat` — Firebase ID token required |
 | MCP dependency | Private Cloud Run service |
 
 ## End-to-end architecture
-
+![Secure BigQuery RAG and Google ADK Architecture](assets/secure-bigquery-rag-adk.png)
 ```text
 User
- â”‚
- â–¼
+ │
+ ▼
 React + Firebase Hosting
- â”‚  Google sign-in
- â”‚  Firebase ID token in Authorization header
- â–¼
+ │  Google sign-in
+ │  Firebase ID token in Authorization header
+ ▼
 FastAPI /chat on Cloud Run
- â”‚  verifies Firebase token and derives UID
- â–¼
+ │  verifies Firebase token and derives UID
+ ▼
 Google ADK Agent + Gemini 2.5 Flash
- â”‚  generates Google Cloud identity token
- â–¼
+ │  generates Google Cloud identity token
+ ▼
 Private Streamable HTTP MCP service
- â”‚  semantic_search tool
- â–¼
+ │  semantic_search tool
+ ▼
 BigQuery AI.GENERATE_EMBEDDING + VECTOR_SEARCH
- â”‚
- â–¼
+ │
+ ▼
 Grounded answer with source/page citations
 ```
 
@@ -74,26 +74,26 @@ The Firebase token is never forwarded to the MCP service. The browser never rece
 
 ```text
 atomic-habits-adk-rag/
-â”œâ”€â”€ atomic_habits_agent/
-â”‚   â”œâ”€â”€ __init__.py
-â”‚   â”œâ”€â”€ agent.py               # ADK agent and remote MCP toolset
-â”‚   â””â”€â”€ .env.example
-â”œâ”€â”€ frontend/
-â”‚   â”œâ”€â”€ src/
-â”‚   â”‚   â”œâ”€â”€ App.jsx            # Authenticated chat interface
-â”‚   â”‚   â”œâ”€â”€ App.css
-â”‚   â”‚   â”œâ”€â”€ firebase.js        # Firebase browser initialization
-â”‚   â”‚   â””â”€â”€ main.jsx
-â”‚   â”œâ”€â”€ .env.example
-â”‚   â”œâ”€â”€ firebase.json
-â”‚   â”œâ”€â”€ package.json
-â”‚   â””â”€â”€ index.html
-â”œâ”€â”€ main.py                    # FastAPI API, Firebase verification, ADK runner
-â”œâ”€â”€ Dockerfile
-â”œâ”€â”€ requirements.txt
-â”œâ”€â”€ .dockerignore
-â”œâ”€â”€ .gitignore
-â””â”€â”€ README.md
+├── atomic_habits_agent/
+│   ├── __init__.py
+│   ├── agent.py               # ADK agent and remote MCP toolset
+│   └── .env.example
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx            # Authenticated chat interface
+│   │   ├── App.css
+│   │   ├── firebase.js        # Firebase browser initialization
+│   │   └── main.jsx
+│   ├── .env.example
+│   ├── firebase.json
+│   ├── package.json
+│   └── index.html
+├── main.py                    # FastAPI API, Firebase verification, ADK runner
+├── Dockerfile
+├── requirements.txt
+├── .dockerignore
+├── .gitignore
+└── README.md
 ```
 
 ## Component responsibilities
@@ -261,12 +261,12 @@ Use the Firebase project attached to Google Cloud project `bigquery-semantic-sea
 In the Firebase console:
 
 1. Select `bigquery-semantic-search`.
-2. Open **Authentication â†’ Sign-in method**.
+2. Open **Authentication → Sign-in method**.
 3. Enable **Google**.
-4. Open **Project settings â†’ General â†’ Your apps**.
+4. Open **Project settings → General → Your apps**.
 5. Register a Web app.
 6. Copy the Firebase Web configuration values.
-7. Under **Authentication â†’ Settings â†’ Authorized domains**, add the domains used for local and deployed testing.
+7. Under **Authentication → Settings → Authorized domains**, add the domains used for local and deployed testing.
 
 Firebase Authentication stores user identity information. It does not automatically store chat messages.
 
@@ -361,13 +361,13 @@ The browser flow is:
 
 ```text
 signInWithPopup
-â†’ Firebase user
-â†’ user.getIdToken()
-â†’ Authorization: Bearer <Firebase ID token>
-â†’ POST /chat
+→ Firebase user
+→ user.getIdToken()
+→ Authorization: Bearer <Firebase ID token>
+→ POST /chat
 ```
 
-For browsers where Firebase IndexedDB persistence failsâ€”particularly restrictive Incognito sessionsâ€”the implementation can initialize Auth with `browserSessionPersistence` and `browserPopupRedirectResolver`. This uses session storage for the demo instead of relying on IndexedDB.
+For browsers where Firebase IndexedDB persistence fails—particularly restrictive Incognito sessions—the implementation can initialize Auth with `browserSessionPersistence` and `browserPopupRedirectResolver`. This uses session storage for the demo instead of relying on IndexedDB.
 
 ## 8. Run React locally
 
@@ -522,13 +522,13 @@ gcloud run services logs read "$MCP_SERVICE" \
 View signed-in users:
 
 ```text
-Firebase Console â†’ Authentication â†’ Users
+Firebase Console → Authentication → Users
 ```
 
 View API request count, latency, status codes, CPU, memory, and instances:
 
 ```text
-Google Cloud Console â†’ Cloud Run â†’ atomic-habits-agent-api â†’ Metrics
+Google Cloud Console → Cloud Run → atomic-habits-agent-api → Metrics
 ```
 
 Firebase Authentication and Hosting do not automatically store message content.
@@ -586,7 +586,7 @@ Configure a Google Cloud billing budget and alerts before sharing the applicatio
 1. Add persistent sessions and user-controlled chat deletion.
 2. Add Firestore or another durable store only if chat-history retention is desired.
 3. Add Firebase App Check and per-user request limits.
-4. Add structured traces across Agent â†’ MCP â†’ BigQuery.
+4. Add structured traces across Agent → MCP → BigQuery.
 5. Add retrieval and grounded-answer evaluations.
 6. Add dynamic document ingestion with ownership and tenant isolation.
 7. Add CI checks and Firebase Hosting preview deployments for pull requests.
