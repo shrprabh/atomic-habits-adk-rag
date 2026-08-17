@@ -1,0 +1,13 @@
+{
+  "projects": {},
+  "targets": {
+    "bigquery-semantic-search": {
+      "hosting": {
+        "web": [
+          "bigquery-semantic-search"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
